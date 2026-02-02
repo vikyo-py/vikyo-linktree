@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vikyo | linktree</title>
+
+
+<style>
+    :root {
+        /* Nova Paleta Pastel */
+        --bg-color: #fcfafc;      /* Off-white levemente rosado */
+        --text-color: #4a4a4a;    /* Cinza escuro suave */
+        --text-muted: #9b89a1;    /* Roxo acinzentado */
+        --accent: #d8bfd8;        /* Lavanda pastel */
+        --accent-hover: #efd3ef;  /* Rosa pastel claro */
+        --card-bg: #ffffff;
+        --card-border: #eee1f0;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Outfit', sans-serif;
+        background: var(--bg-color);
+        color: var(--text-color);
+        overflow: hidden;
+    }
+
+    #scroll-container {
+        height: 100vh;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+    }
+
+    section {
+        height: 100vh;
+        width: 100%;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        scroll-snap-align: start;
+        position: relative;
+    }
+
+    /* Glows */
+    .glow {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: var(--accent);
+        filter: blur(120px);
+        opacity: 0.3;
+        border-radius: 50%;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .hero-content {
+        text-align: center;
+        animation: fadeIn 1.5s ease;
+        /* Adicionei z-index para garantir que os botões fiquem clicáveis sobre o glow */
+        z-index: 10; 
+    }
+
+    .avatar-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        object-fit: cover;
+        box-shadow: 0 10px 25px rgba(216, 191, 216, 0.4);
+        transition: transform 0.3s ease;
+    }
+
+    .avatar:hover {
+        transform: scale(1.05);
+    }
+
+    h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        letter-spacing: -1px;
+        margin-bottom: 10px;
+        color: var(--text-color);
+    }
+
+    p.subtitle {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+    }
+
+    /* --- ÁREA DOS LINKS ALTERADA --- */
+    .links {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start; /* Alinha tudo no topo para o menu não quebrar o layout */
+    }
+
+    /* Estilo padrão do botão */
+    .btn {
+        padding: 12px 28px;
+        background: #fff;
+        border: 1px solid var(--card-border);
+        color: var(--text-color);
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-block;
+        font-family: inherit; /* Para botões <button> herdarem a fonte */
+        font-size: 1rem;
+    }
+
+    .btn:hover {
+        background: var(--accent);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(216, 191, 216, 0.4);
+    }
+
+    /* --- NOVO ESTILO DO MENU DROPDOwN --- */
+    .portfolio-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    /* Container das opções ocultas */
+    .portfolio-options {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.4s ease, opacity 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    /* Classe que ativamos com JS para mostrar o menu */
+    .portfolio-options.show {
+        max-height: 150px; /* Altura suficiente para mostrar os botões */
+        opacity: 1;
+    }
+
+    .sub-btn {
+        font-size: 0.9rem;
+        padding: 8px 20px;
+        background: rgba(255, 255, 255, 0.6); /* Um pouco mais transparente */
+        width: 100%; /* Ocupa a largura do pai */
+    }
+    /* ------------------------------------- */
+
+    /* Galeria de Arte */
+    .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        width: 100%;
+        max-width: 900px;
+    }
+
+    .art-card {
+        background: var(--card-bg);
+        padding: 12px;
+        border-radius: 20px;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        transition: transform 0.3s ease;
+    }
+
+    .art-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--accent);
+    }
+
+    .art-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 15px;
+        display: block;
+    }
+
+    h2 {
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+        color: var(--text-color);
+        font-weight: 700;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        h1 { font-size: 2.5rem; }
+        .gallery { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+
+<body>
+
+<div id="scroll-container">
+
+    <section class="hero">
+        <div class="glow" style="top: 10%; left: 10%;"></div>
+        <div class="glow" style="bottom: 10%; right: 10%; background: var(--accent-hover);"></div>
+        
+        <div class="hero-content">
+            <div class="avatar-container">
+                <img src="jhgfvhythpicghjg.png" alt="vikyo avatar" class="avatar">
+            </div>
+            <h1>vikyo</h1>
+            <p class="subtitle">ilustrador & programador</p>
+            
+            <div class="links">
+                <div class="portfolio-wrapper">
+                    <button class="btn" onclick="togglePortfolio()">Portfólio ▾</button>
+                    
+                    <div class="portfolio-options" id="portfolioMenu">
+                        <a href="#secao-artista" class="btn sub-btn">Artista</a>
+                        <a href="#secao-dev" class="btn sub-btn">Programação</a>
+                    </div>
+                </div>
+                <a href="https://www.instagram.com/vikyo_thesketcher/?next=%2Fvini_.kk%2F" class="btn">Instagram</a>
+                <a href="https://www.youtube.com/channel/UC1qlgYVYnsbGlxo5MdCYEOw" class="btn">YouTube</a>
+                <a href="#" class="btn">Contato</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="art" id="secao-artista">
+        <h2>artes recentes</h2>
+        <div class="gallery">
+            <div class="art-card">
+                <img src="artr1.webp" alt="Arte Digital 1" loading="lazy">
+            </div>
+            <div class="art-card">
+                <img src="artr2.webp" alt="Arte Digital 2" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // Função para abrir/fechar o menu de portfólio
+    function togglePortfolio() {
+        const menu = document.getElementById('portfolioMenu');
+        menu.classList.toggle('show');
+    }
+
+    // Efeito suave de movimento nos elementos de brilho (glow)
+    document.addEventListener('mousemove', (e) => {
+        const glows = document.querySelectorAll('.glow');
+        glows.forEach(glow => {
+            const x = (window.innerWidth - e.pageX * 2) / 90;
+            const y = (window.innerHeight - e.pageY * 2) / 90;
+            glow.style.transform = `translateX(${x}px) translateY(${y}px)`;
+        });
+    });
+</script>
+
+</body>
+</html> 
